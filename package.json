@@ -1,0 +1,32 @@
+{
+  "name": "web-page-summarizer",
+  "version": "1.0.0",
+  "description": "Firefox extension to summarize web pages using Google Gemini AI and save to Joplin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/gemini-joplin-ext.git"
+  },
+  "keywords": [
+    "firefox",
+    "extension",
+    "web-clipper",
+    "summarizer",
+    "gemini",
+    "joplin",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "web-ext": "^7.8.0"
+  },
+  "scripts": {
+    "start": "web-ext run",
+    "build": "web-ext build",
+    "lint": "web-ext lint",
+    "sign": "web-ext sign --api-key=$WEB_EXT_API_KEY --api-secret=$WEB_EXT_API_SECRET"
+  },
+  "engines": {
+    "firefox": ">=109.0"
+  }
+}

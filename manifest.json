@@ -1,0 +1,32 @@
+{
+    "manifest_version": 3,
+    "name": "Web Page Summarizer",
+    "version": "1.0.0",
+    "description": "Summarize any web page using Gemini AI and save it directly to Joplin.",
+    "permissions": [
+        "contextMenus",
+        "storage",
+        "activeTab",
+        "scripting",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://generativelanguage.googleapis.com/*",
+        "http://localhost/*"
+    ],
+    "background": {
+        "scripts": ["background.js"]    
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "web-page-summarizer@localhost"
+        }
+    }
+}
