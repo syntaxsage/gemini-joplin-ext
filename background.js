@@ -1,35 +1,147 @@
-// 1. Create the right click menu item
+// Global variable to store selected text
+let lastSelectedText = null;
+let lastPageUrl = null;
+let lastPageTitle = null;
+
+// 1. Create the right click menu items
 browser.runtime.onInstalled.addListener(() => {
+    // Summarize entire page context menu
     browser.contextMenus.create({
-        id: "summarize-to-joplin",
+        id: "summarize-page",
         title: "Summarize Page and Send to Joplin",
-        contexts: ["all"]
+        contexts: ["page"]
     });
+    
+    // Summarize selection context menu
+    browser.contextMenus.create({
+        id: "summarize-selection",
+        title: "Summarize Selection and Send to Joplin",
+        contexts: ["selection"]
+    });
+});
+
+// Message listener for content script and preview window
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "setSelectedText") {
+        lastSelectedText = message.text;
+    } else if (message.action === "saveSummary") {
+        // Preview window asking to save
+        handleSummarization(message.text, message.title, message.url, message.isSelection)
+            .catch(error => {
+                showNotification(`Failed to save: ${error.message}`, "error");
+            });
+        sendResponse({ status: "processing" });
+    } else if (message.action === "generateSummary") {
+        // Preview window asking to generate summary
+        getGeminiSummary(message.content)
+            .then(summary => {
+                sendResponse({ summary: summary });
+            })
+            .catch(error => {
+                sendResponse({ error: error.message });
+            });
+        return true; // Keep channel open for async response
+    }
+});
+
+// Handle keyboard shortcut
+browser.commands.onCommand.addListener((command) => {
+    console.log("[Background] Command triggered:", command);
+    
+    if (command === "summarize-page") {
+        // Get active tab and summarize
+        browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+            if (tabs[0]) {
+                handleContextMenuClick({
+                    menuItemId: "summarize-page",
+                    targetId: tabs[0].id
+                }, tabs[0]);
+            }
+        });
+    }
 });
 
 // 2. Handle the click event
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (info.menuItemId === "summarize-to-joplin") {
-        try {
-            // Show progress notification
+    console.log("[Background] Context menu clicked:", info.menuItemId);
+    
+    if (info.menuItemId === "summarize-page" || info.menuItemId === "summarize-selection") {
+        handleContextMenuClick(info, tab);
+    }
+});
+
+async function handleContextMenuClick(info, tab) {
+    try {
+        let contentToSummarize = null;
+        let isSelection = false;
+        
+        if (info.menuItemId === "summarize-selection") {
+            // Use selected text
+            contentToSummarize = info.selectionText;
+            isSelection = true;
+            console.log("[Background] Summarizing selection, length:", contentToSummarize.length);
+        } else {
+            // Get entire page content
             showNotification("Extracting page content and generating summary...", "info");
-            
-            // Get page content
             const [{ result }] = await browser.scripting.executeScript({
                 target: { tabId: tab.id },
                 func: () => document.body.innerText,
             });
-
-            const summary = await getGeminiSummary(result);
-            await sendToJoplin(tab.title, summary, tab.url);
-
-            // Show success notification
-            showNotification(`"${tab.title}" summarized and saved to Joplin!`, "success");
-        } catch (error) {
-            showNotification(`Failed to summarize: ${error.message}`, "error");
+            contentToSummarize = result;
+            isSelection = false;
+            console.log("[Background] Summarizing page, length:", contentToSummarize.length);
         }
+
+        // Show preview window
+        showSummaryPreview(contentToSummarize, tab.title, tab.url, isSelection);
+        
+    } catch (error) {
+        showNotification(`Failed to process: ${error.message}`, "error");
     }
-});
+}
+
+async function handleSummarization(text, title, url, isSelection) {
+    try {
+        showNotification("Generating summary with Gemini AI...", "info");
+        const summary = await getGeminiSummary(text);
+        
+        showNotification("Saving to Joplin...", "info");
+        await sendToJoplin(title, summary, url);
+
+        const summaryType = isSelection ? "selection" : "page";
+        showNotification(`"${title}" ${summaryType} summarized and saved to Joplin!`, "success");
+    } catch (error) {
+        showNotification(`Failed to summarize: ${error.message}`, "error");
+        throw error;
+    }
+}
+
+// Helper function to show summary preview window
+async function showSummaryPreview(content, title, url, isSelection) {
+    try {
+        const encodedContent = encodeURIComponent(content);
+        const encodedTitle = encodeURIComponent(title);
+        const encodedUrl = encodeURIComponent(url);
+        
+        const previewUrl = browser.runtime.getURL("summary-preview.html") + 
+            `?content=${encodedContent}&title=${encodedTitle}&url=${encodedUrl}&isSelection=${isSelection}`;
+        
+        console.log("[Background] Opening preview window");
+        
+        // Open preview in a new window or tab
+        browser.windows.create({
+            url: previewUrl,
+            type: "normal",
+            width: 800,
+            height: 600
+        });
+    } catch (error) {
+        console.error("Failed to open preview:", error);
+        // Fallback: proceed without preview
+        showNotification("Opening preview failed, proceeding with summarization...", "info");
+        // Don't throw, just continue
+    }
+}
 
 // Helper function to show notifications to the user
 function showNotification(message, type = "success") {
@@ -105,22 +217,28 @@ async function getGeminiSummary(text) {
 
 // 4. Send to Joplin Local API
 async function sendToJoplin(title, body, sourceUrl) {
-    // Pull the token from storage
-    const settings = await browser.storage.local.get(["joplinToken", "joplinPort"]);
+    // Pull the token and settings from storage
+    const settings = await browser.storage.local.get(["joplinToken", "joplinPort", "joplinNotebook"]);
     if (!settings.joplinToken) throw new Error("Missing Joplin Web Clipper Token");
     
     const port = settings.joplinPort || 41184;
     const sanitizedTitle = title.substring(0, 200); // Limit title length
 
     try {
-        const response = await fetch(`http://localhost:${port}/notes?token=${settings.joplinToken}`, {
+        const payload = {
+            title: `Summary: ${sanitizedTitle}`,
+            body: `${body}\n\n---\nSource: [${sourceUrl}](${sourceUrl})`,
+        };
+        
+        // Add parent_id if a specific notebook was selected
+        if (settings.joplinNotebook && settings.joplinNotebook !== "default") {
+            payload.parent_id = settings.joplinNotebook;
+        }
+
+        const response = await fetch(`http://localhost:${port}/notes?token=${encodeURIComponent(settings.joplinToken)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: `Summary: ${sanitizedTitle}`,
-                body: `${body}\n\n---\nSource: [${sourceUrl}](${sourceUrl})`,
-                parent_id: "" // Optional: ID of a specific notebook
-            })
+            body: JSON.stringify(payload)
         });
 
         if (!response.ok) {

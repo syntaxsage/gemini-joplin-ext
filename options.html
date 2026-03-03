@@ -157,6 +157,15 @@
     </div>
     
     <div class="field">
+        <label for="joplinNotebook">Save to Notebook:</label>
+        <div class="description">Select which notebook to save summaries to (default is root)</div>
+        <select id="joplinNotebook" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            <option value="default">Default (Root)</option>
+        </select>
+        <button type="button" id="refresh-notebooks" style="margin-top: 5px; background: #555;">Refresh Notebooks</button>
+    </div>
+    
+    <div class="field">
         <button type="button" id="test-joplin">Test Joplin Connection</button>
         <div id="connection-status"></div>
     </div>

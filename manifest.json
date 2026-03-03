@@ -23,6 +23,21 @@
     "background": {
         "scripts": ["background.js"]    
     },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
+    "commands": {
+        "summarize-page": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S",
+                "mac": "Command+Shift+S"
+            },
+            "description": "Summarize the current page"
+        }
+    },
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
@@ -38,5 +53,11 @@
         "gecko": {
             "id": "web-page-summarizer@localhost"
         }
-    }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["summary-preview.html"],
+            "matches": ["<all_urls>"]
+        }
+    ]
 }

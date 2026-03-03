@@ -6,9 +6,13 @@ A Firefox extension that summarizes any web page using Google's Gemini AI and se
 
 - 🤖 **AI-Powered Summarization**: Uses Google's Gemini AI to create intelligent summaries of web content
 - 📝 **Direct Joplin Integration**: Automatically saves summaries to your Joplin notebook
+- ⌨️ **Keyboard Shortcut**: Summarize with `Ctrl+Shift+S` (press `Cmd+Shift+S` on Mac)
+- 🔍 **Selection Summarization**: Right-click and summarize any selected text on a page
+- 👁️ **Summary Preview**: Review the AI-generated summary before saving to Joplin
+- 📚 **Notebook Selection**: Choose which Joplin notebook to save summaries to
+- 🔔 **Desktop Notifications**: Get instant feedback when summaries are saved
 - 🔐 **Secure**: Your API keys are stored locally and never shared
-- 🌐 **Universal**: Works on any web page or specific sections
-- ⚙️ **Customizable**: Configure your own API keys and Joplin port
+- ⚙️ **Customizable**: Configure API keys, Joplin settings, and target notebooks
 
 ## Installation
 
@@ -85,16 +89,48 @@ Before installing this extension, you need:
 
 ## Usage
 
-### Summarize a Web Page
+### Method 1: Keyboard Shortcut (Fastest)
+
+Press **`Ctrl+Shift+S`** (or **`Cmd+Shift+S`** on Mac) on any web page to summarize the entire page:
+- A preview window opens showing the AI-generated summary
+- Review and optionally edit the summary
+- Click "Save to Joplin" to save the note
+- Desktop notification confirms the save
+
+### Method 2: Summarize Entire Page
 
 1. **Right-click** anywhere on a web page
 2. Select **"Summarize Page and Send to Joplin"** from the context menu
-3. The extension will:
-   - Extract the page content
-   - Send it to Gemini AI for summarization
-   - Create a new note in Joplin with the summary
-   - Include the source URL for reference
-4. Check your Joplin application for the new summary note
+3. A preview window opens with the generated summary
+4. Review the summary (optional: edit before saving)
+5. Click **"Save to Joplin"** to create the note
+
+### Method 3: Summarize Selected Text
+
+1. **Highlight/select** the text you want to summarize
+2. **Right-click** on the selection
+3. Select **"Summarize Selection and Send to Joplin"** from the context menu
+4. A preview window opens with the summary of just that text
+5. Review and save to Joplin
+
+### Setting Your Preferred Notebook
+
+1. Go to **Extension Settings** (Click the extension icon → Settings)
+2. In the **Joplin Configuration** section, click **"Refresh Notebooks"**
+3. Select your preferred notebook from the dropdown
+4. Click **"Save Settings"**
+5. All future summaries will be saved to this notebook
+
+### How It Works
+
+1. You submit a page or selection for summarization
+2. The extension extracts the content
+3. Sends it to Google Gemini AI for intelligent summarization
+4. The preview window shows the generated summary
+5. You can review and optionally edit before confirming
+6. The note is created in your selected Joplin notebook
+7. A desktop notification confirms the save
+8. The source URL is automatically included for reference
 
 ### Troubleshooting
 

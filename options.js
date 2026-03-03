@@ -26,11 +26,13 @@ function saveOptions(e) {
   const geminiKey = document.querySelector("#geminiKey").value.trim();
   const joplinToken = document.querySelector("#joplinToken").value.trim();
   const joplinPort = document.querySelector("#joplinPort").value || "41184";
+  const joplinNotebook = document.querySelector("#joplinNotebook").value || "default";
   
   console.log("Values to save:", {
     geminiKey: geminiKey ? "***" : "empty",
     joplinToken: joplinToken ? "***" : "empty",
-    joplinPort: joplinPort
+    joplinPort: joplinPort,
+    joplinNotebook: joplinNotebook
   });
   
   // Validate inputs
@@ -53,7 +55,8 @@ function saveOptions(e) {
   browser.storage.local.set({
     geminiKey: geminiKey,
     joplinToken: joplinToken,
-    joplinPort: joplinPort
+    joplinPort: joplinPort,
+    joplinNotebook: joplinNotebook
   }).then(() => {
     console.log("Settings saved successfully");
     showStatus("Settings saved successfully!", "success");
@@ -66,7 +69,7 @@ function saveOptions(e) {
 // Restore settings when the page loads
 function restoreOptions() {
   console.log("Restoring options");
-  browser.storage.local.get(["geminiKey", "joplinToken", "joplinPort"]).then((result) => {
+  browser.storage.local.get(["geminiKey", "joplinToken", "joplinPort", "joplinNotebook"]).then((result) => {
     console.log("Retrieved stored values");
     if (result.geminiKey) {
       document.querySelector("#geminiKey").value = result.geminiKey;
@@ -80,9 +83,71 @@ function restoreOptions() {
       document.querySelector("#joplinPort").value = result.joplinPort;
       console.log("Restored Joplin port:", result.joplinPort);
     }
+    if (result.joplinNotebook) {
+      document.querySelector("#joplinNotebook").value = result.joplinNotebook;
+      console.log("Restored Joplin notebook:", result.joplinNotebook);
+    }
   }).catch((error) => {
     console.error("Failed to restore options:", error);
   });
+}
+
+// Fetch notebooks from Joplin
+async function refreshNotebooks() {
+  console.log("Refreshing notebooks from Joplin");
+  const token = document.querySelector("#joplinToken").value.trim();
+  const port = document.querySelector("#joplinPort").value || "41184";
+  
+  if (!token) {
+    showStatus("Please enter your Joplin token first.", "error");
+    return;
+  }
+  
+  const btn = document.getElementById('refresh-notebooks');
+  btn.disabled = true;
+  btn.textContent = "Refreshing...";
+  
+  try {
+    console.log(`Fetching notebooks from localhost:${port}`);
+    
+    const response = await fetch(`http://localhost:${port}/folders?token=${encodeURIComponent(token)}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: Failed to fetch notebooks`);
+    }
+    
+    const folders = await response.json();
+    console.log("Received folders:", folders.length);
+    
+    const select = document.querySelector("#joplinNotebook");
+    
+    // Clear existing options except default
+    while (select.options.length > 1) {
+      select.remove(1);
+    }
+    
+    // Add folders to dropdown
+    if (Array.isArray(folders)) {
+      folders.forEach(folder => {
+        if (folder.id && folder.title) {
+          const option = document.createElement("option");
+          option.value = folder.id;
+          option.textContent = folder.title;
+          select.appendChild(option);
+          console.log("Added folder:", folder.title);
+        }
+      });
+    }
+    
+    showStatus(`[SUCCESS] Found ${folders.length} notebooks!`, "success");
+    
+  } catch (error) {
+    console.error("Failed to fetch notebooks:", error);
+    showStatus(`Failed to refresh notebooks: ${error.message}`, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Refresh Notebooks";
+  }
 }
 
 // Test Joplin connection
@@ -167,6 +232,15 @@ document.addEventListener("DOMContentLoaded", () => {
     testJoplinBtn.addEventListener("click", testJoplinConnection);
   } else {
     console.error("Test Joplin button not found!");
+  }
+  
+  // Attach refresh notebooks button listener
+  const refreshBtn = document.querySelector("#refresh-notebooks");
+  if (refreshBtn) {
+    console.log("Refresh notebooks button found, attaching listener");
+    refreshBtn.addEventListener("click", refreshNotebooks);
+  } else {
+    console.error("Refresh notebooks button not found!");
   }
   
   console.log("Options page initialization complete");
