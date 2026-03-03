@@ -6,7 +6,6 @@ A Firefox extension that summarizes any web page using Google's Gemini AI and se
 
 - 🤖 **AI-Powered Summarization**: Uses Google's Gemini AI to create intelligent summaries of web content
 - 📝 **Direct Joplin Integration**: Automatically saves summaries to your Joplin notebook
-- ⌨️ **Keyboard Shortcut**: Summarize with `Ctrl+Shift+S` (press `Cmd+Shift+S` on Mac)
 - 🔍 **Selection Summarization**: Right-click and summarize any selected text on a page
 - 👁️ **Summary Preview**: Review the AI-generated summary before saving to Joplin
 - 📚 **Notebook Selection**: Choose which Joplin notebook to save summaries to
@@ -89,15 +88,7 @@ Before installing this extension, you need:
 
 ## Usage
 
-### Method 1: Keyboard Shortcut (Fastest)
-
-Press **`Ctrl+Shift+S`** (or **`Cmd+Shift+S`** on Mac) on any web page to summarize the entire page:
-- A preview window opens showing the AI-generated summary
-- Review and optionally edit the summary
-- Click "Save to Joplin" to save the note
-- Desktop notification confirms the save
-
-### Method 2: Summarize Entire Page
+### Method 1: Summarize Entire Page
 
 1. **Right-click** anywhere on a web page
 2. Select **"Summarize Page and Send to Joplin"** from the context menu
@@ -105,7 +96,7 @@ Press **`Ctrl+Shift+S`** (or **`Cmd+Shift+S`** on Mac) on any web page to summar
 4. Review the summary (optional: edit before saving)
 5. Click **"Save to Joplin"** to create the note
 
-### Method 3: Summarize Selected Text
+### Method 2: Summarize Selected Text
 
 1. **Highlight/select** the text you want to summarize
 2. **Right-click** on the selection

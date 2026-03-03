@@ -116,8 +116,12 @@ async function refreshNotebooks() {
       throw new Error(`HTTP ${response.status}: Failed to fetch notebooks`);
     }
     
-    const folders = await response.json();
-    console.log("Received folders:", folders.length);
+    const data = await response.json();
+    console.log("Received data:", data);
+    
+    // Handle both array response and object with items property
+    let folders = Array.isArray(data) ? data : (data.items || data.folders || []);
+    console.log("Parsed folders:", folders.length);
     
     const select = document.querySelector("#joplinNotebook");
     
@@ -139,7 +143,9 @@ async function refreshNotebooks() {
       });
     }
     
-    showStatus(`[SUCCESS] Found ${folders.length} notebooks!`, "success");
+    const count = folders.length || 0;
+    showStatus(`[SUCCESS] Found ${count} notebooks!`, "success");
+    console.log("Refresh complete, total folders:", count);
     
   } catch (error) {
     console.error("Failed to fetch notebooks:", error);

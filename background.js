@@ -44,23 +44,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-// Handle keyboard shortcut
-browser.commands.onCommand.addListener((command) => {
-    console.log("[Background] Command triggered:", command);
-    
-    if (command === "summarize-page") {
-        // Get active tab and summarize
-        browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
-            if (tabs[0]) {
-                handleContextMenuClick({
-                    menuItemId: "summarize-page",
-                    targetId: tabs[0].id
-                }, tabs[0]);
-            }
-        });
-    }
-});
-
 // 2. Handle the click event
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     console.log("[Background] Context menu clicked:", info.menuItemId);

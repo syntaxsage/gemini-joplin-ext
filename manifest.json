@@ -29,15 +29,6 @@
             "js": ["content.js"]
         }
     ],
-    "commands": {
-        "summarize-page": {
-            "suggested_key": {
-                "default": "Ctrl+Shift+S",
-                "mac": "Command+Shift+S"
-            },
-            "description": "Summarize the current page"
-        }
-    },
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
