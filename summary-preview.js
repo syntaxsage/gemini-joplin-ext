@@ -62,7 +62,18 @@ function showStatus(message, type) {
     statusEl.classList.remove('loading', 'error');
     
     if (type === 'loading') {
-        statusEl.innerHTML = `<span class="spinner"></span>${message}`;
+        // Clear previous content safely
+        statusEl.textContent = '';
+        
+        // Create spinner element safely
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner';
+        statusEl.appendChild(spinner);
+        
+        // Add message text safely
+        const messageText = document.createTextNode(message);
+        statusEl.appendChild(messageText);
+        
         statusEl.classList.add(type);
     } else if (type === 'error') {
         statusEl.textContent = message;

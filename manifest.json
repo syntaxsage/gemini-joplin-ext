@@ -42,7 +42,10 @@
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "web-page-summarizer@localhost"
+            "id": "web-page-summarizer@localhost",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
         }
     },
     "web_accessible_resources": [
