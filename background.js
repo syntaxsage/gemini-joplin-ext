@@ -11,6 +11,9 @@ browser.runtime.onInstalled.addListener(() => {
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "summarize-to-joplin") {
         try {
+            // Show progress notification
+            showNotification("Extracting page content and generating summary...", "info");
+            
             // Get page content
             const [{ result }] = await browser.scripting.executeScript({
                 target: { tabId: tab.id },
@@ -20,18 +23,36 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             const summary = await getGeminiSummary(result);
             await sendToJoplin(tab.title, summary, tab.url);
 
-            // Show notification to user
-            showNotification("Success! Summary saved to Joplin.");
+            // Show success notification
+            showNotification(`"${tab.title}" summarized and saved to Joplin!`, "success");
         } catch (error) {
-            showNotification(`Error: ${error.message}`, "error");
+            showNotification(`Failed to summarize: ${error.message}`, "error");
         }
     }
 });
 
-// Helper function to show notifications via browser extension
+// Helper function to show notifications to the user
 function showNotification(message, type = "success") {
+    let title = "Web Page Summarizer";
+    const iconUrl = "icons/icon-96.png";
+    
+    if (type === "error") {
+        title = "Web Page Summarizer - Error";
+    } else if (type === "info") {
+        title = "Web Page Summarizer - Processing...";
+    }
+    
     console.log(`[${type.toUpperCase()}] ${message}`);
-    // In the future, this could use browser.notifications API
+    
+    browser.notifications.create({
+        type: "basic",
+        title: title,
+        message: message,
+        iconUrl: iconUrl
+    }).catch(error => {
+        // Fallback: just log if notifications API fails
+        console.error("Notification failed:", error);
+    });
 }
 
 // 3. Call Gemini API

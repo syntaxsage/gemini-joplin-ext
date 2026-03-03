@@ -133,32 +133,32 @@
     <p>Configure your API keys and Joplin connections below.</p>
     
     <h3>Gemini AI Configuration</h3>
-    <div class=\"field\">
-        <label for=\"geminiKey\">Google Gemini API Key:</label>
-        <div class=\"description\">Your API key for accessing Google's Gemini AI model</div>
-        <input type=\"password\" id=\"geminiKey\" placeholder=\"Paste your Google AI key here\">
+    <div class="field">
+        <label for="geminiKey">Google Gemini API Key:</label>
+        <div class="description">Your API key for accessing Google's Gemini AI model</div>
+        <input type="password" id="geminiKey" placeholder="Paste your Google AI key here">
     </div>
     
-    <div class=\"help-text\">
-        📚 Don't have a Gemini API key? Get one for free at <a href=\"https://aistudio.google.com/apikey\" target=\"_blank\">Google AI Studio</a>
+    <div class="help-text">
+        <strong>Getting Started:</strong> Don't have a Gemini API key? Get one for free at <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>
     </div>
     
     <h3>Joplin Configuration</h3>
-    <div class=\"field\">
-        <label for=\"joplinToken\">Joplin Web Clipper Token:</label>
-        <div class=\"description\">Find this in Joplin's \"Web Clipper\" settings</div>
-        <input type=\"password\" id=\"joplinToken\" placeholder=\"Your Joplin Web Clipper token\">
+    <div class="field">
+        <label for="joplinToken">Joplin Web Clipper Token:</label>
+        <div class="description">Find this in Joplin's Web Clipper settings</div>
+        <input type="password" id="joplinToken" placeholder="Your Joplin Web Clipper token">
     </div>
     
-    <div class=\"field\">
-        <label for=\"joplinPort\">Joplin Web Clipper Port:</label>
-        <div class=\"description\">Default is 41184, change only if you've configured a custom port</div>
-        <input type=\"number\" id=\"joplinPort\" placeholder=\"41184\" min=\"1\" max=\"65535\">
+    <div class="field">
+        <label for="joplinPort">Joplin Web Clipper Port:</label>
+        <div class="description">Default is 41184, change only if you've configured a custom port</div>
+        <input type="number" id="joplinPort" placeholder="41184" min="1" max="65535">
     </div>
     
-    <div class=\"field\">
-        <button type=\"button\" id=\"test-joplin\">Test Joplin Connection</button>
-        <div id=\"connection-status\"></div>
+    <div class="field">
+        <button type="button" id="test-joplin">Test Joplin Connection</button>
+        <div id="connection-status"></div>
     </div>
     
     <button id="save">Save Settings</button>
